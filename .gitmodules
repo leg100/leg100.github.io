@@ -1,3 +1,12 @@
 [submodule "themes/hugo-theme-yue"]
 	path = themes/hugo-theme-yue
 	url = https://github.com/CyrusYip/hugo-theme-yue
+[submodule "hugo-theme-console"]
+	path = hugo-theme-console
+	url = https://github.com/mrmierzejewski/hugo-theme-console.git
+[submodule "themes/hugo-theme-console"]
+	path = themes/hugo-theme-console
+	url = https://github.com/mrmierzejewski/hugo-theme-console.git
+[submodule "themes/smol"]
+	path = themes/smol
+	url = https://github.com/colorchestra/smol

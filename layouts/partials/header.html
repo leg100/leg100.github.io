@@ -1,0 +1,7 @@
+<header>
+    <div>
+	{{ strings.Repeat ( .Site.Title | len | add 6 ) "=" }}<br>
+	== <a href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a> ==<br>
+	{{ strings.Repeat ( .Site.Title | len | add 6 ) "=" }}
+    </div>
+</header>

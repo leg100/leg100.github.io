@@ -1,0 +1,17 @@
+# Documentation: https://gohugo.io/getting-started/configuration
+# Don't remove _merge, which imports default config
+theme: smol
+baseURL: "https://leg100.github.io/" # Change this to your real domain name, e.g. https://my-cool-domain.org/
+languageCode: en-us
+title: leg100.github.io
+
+params:
+   subtitle: "blah"
+   dateFmt: "02.01.2006 12:01"
+
+menu:
+  footer:
+    - name: Github
+      url: "https://github.com/leg100"
+      weight: 1
+copyright: "Louis Garman"
