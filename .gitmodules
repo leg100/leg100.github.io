@@ -1,0 +1,3 @@
+[submodule "themes/hugo-theme-yue"]
+	path = themes/hugo-theme-yue
+	url = https://github.com/CyrusYip/hugo-theme-yue
