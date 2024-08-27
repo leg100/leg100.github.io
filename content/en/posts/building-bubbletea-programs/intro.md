@@ -4,6 +4,5 @@ In the words of its authors [Bubbletea](https://github.com/charmbracelet/bubblet
 
 I announced PUG on reddit and in response to a user I [provided some pointers](https://www.reddit.com/r/golang/comments/1duart8/comment/lbhwwoj/) on using Bubbletea. This post is a fuller exposition for anyone developing a TUI in Bubbletea. Much of it is informed from various issues and discussions on the Bubbletea github project, where both users and the authors have provided invaluable expertise and guidance.
 
-Note: please raise any errors, typos etc., as an issue on the blog's [github project](https://github.com/leg100/leg100.github.io).
 
 

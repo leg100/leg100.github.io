@@ -28,7 +28,7 @@ func (p *Program) eventLoop(model Model, cmds chan Cmd) (Model, error) {
 }
 ```
 
-An event is received from the commands channel and sent to the `Update()` method on your model. The returned command is sent to an unbuffered channel, which a receiver invokes in a go routine. Your model's `View()` method is then invoked before repeating the loop and processing the next event.
+A message is received from the channel and sent to the `Update()` method on your model. The returned command is sent to a channel, which is invoked in a go routine elsewhere. Your model's `View()` method is then invoked before repeating the loop and processing the next message.
 
 Therefore Bubbletea can only process events as fast as as your `Update()` and `View()` methods. You want these methods to be fast otherwise your program may experience lag, resulting in an unresponsive UI. If your program generates a lot of messages they can back up and the program may appear to stall: a user presses a key and nothing happens for an indetermine amount of time.
 
@@ -97,11 +97,14 @@ func main() {
 }
 ```
 
-Run the program then tail `messages.log` in another terminal:
+Run the program then, in another terminal, tail `messages.log`. Go back to the program and type `messages`, enter, and then quit the program with Ctrl-C, and you should see the other terminal spew out:
 
 ```
 > tail -f messages.log 
-(tea.KeyMsg)  
+(tea.WindowSizeMsg) {
+ Width: (int) 127,
+ Height: (int) 30
+}
 (tea.KeyMsg) m
 (tea.KeyMsg) e
 (tea.KeyMsg) s
@@ -114,9 +117,11 @@ Run the program then tail `messages.log` in another terminal:
 (tea.KeyMsg) ctrl+c
 ```
 
+Note the first message received is the window resize message, which Bubbletea sends to your program shortly after startup.
+
 ## 3. Live reload code changes
 
-Web app developers use [livereload](https://github.com/livereload/livereload-js) to see the effects of code changes in near real-time in the browser. You should do the same for your TUI. I've cobbled together a couple of scripts for PUG:
+Web app developers use [livereload](https://github.com/livereload/livereload-js) to see the effects of code changes in near real-time in the browser. You should do the equivalent for your TUI. I've cobbled together a couple of scripts for PUG:
 
 ```bash
 #!/usr/bin/env bash
@@ -233,7 +238,7 @@ Returns:
 uninitialized
 ```
 
-...but only once a key is pressed several seconds later:
+...but only once a key is pressed several seconds later does it return:
 
 ```
 initialized
@@ -682,6 +687,8 @@ As you can see the test emulates the user pressing keys and checking that the pr
 
 While this particular test is only checking for sub-strings, the blog article linked above shows how teatest supports using "golden files", where the entire output is captured the first time the test is run, and subsequent tests then check the content matches the captured output. That's useful for regression testing of content, but does mean you need to re-generate the golden files everytime you make even minor changes to the content of your program.
 
+Note: as of writing teatest is part of Charm's [experimental](https://github.com/charmbracelet/x) repo, which means there is no promise of backwards compatibility.
+
 ## 10. Record demos and screenshots on VHS
 
 This one isn't about building your program per se but testing and documenting and presenting it to your audience. Charm make lots of nice tools for the terminal and [VHS](https://github.com/charmbracelet/vhs) is one such tool that meets this requirement to a tee.
@@ -727,13 +734,15 @@ Which then outputs the animated gif specified in the tape. Here is the full anim
 
 ![pug demo](https://github.com/leg100/pug/raw/master/demo/demo.gif)
 
-Commit the tape alongside your code. You can opt to record a new video as part of your build pipeline, and then watch the video prior to making a release. The same tape can produce screenshots which again form part of your testing as well documentation.
+Commit the tape alongside your code. You can opt to record a new video as part of your build pipeline. The same tape can produce screenshots which again form part of your (manual) testing as well as documentation.
 
 ## 11. And more...
 
-I'll endeavour to keep adding more "best practices" as I come across them. But there is no substitute for reading the code of Bubbletea and Bubbletea-based projects. I invite you to read the code of [PUG](https://github.com/leg100/pug), which implements several components that may be of use to your own project:
+I'll endeavour to keep adding more "pointers" as I come across them. But there is no substitute for reading the code of Bubbletea and Bubbletea-based projects. I invite you to read the code of [PUG](https://github.com/leg100/pug), which implements several components that may be of use to your own project:
 
 * Table widget, with selections, sorting, filtering, and custom row rendering.
 * Split model: split screen with table and preview panes; adjustable/toggleable split.
 * Navigator: makes and caches models, history tracker.
 * Integration tests: using teatest for end-to-end testing.
+
+Note: please raise any errors, typos etc., as an issue on the blog's [github project](https://github.com/leg100/leg100.github.io).
