@@ -2,7 +2,9 @@ In the words of its authors [Bubbletea](https://github.com/charmbracelet/bubblet
 
 ![pug tasks screenshot](./tasks.png)
 
-I announced PUG on reddit and in response to a user I [provided some pointers](https://www.reddit.com/r/golang/comments/1duart8/comment/lbhwwoj/) on using Bubbletea. This post is a fuller exposition for anyone developing a TUI in Bubbletea. Much of it is informed from various issues and discussions on the Bubbletea github project, where both users and the authors have provided invaluable expertise and guidance.
+I announced PUG on reddit and in response to a user I [provided some pointers](https://www.reddit.com/r/golang/comments/1duart8/comment/lbhwwoj/) on using Bubbletea.
+
+This blog post is a fuller exposition of that advice; it is not a tutorial but hopefully it can assist anyone in the development, debugging, and testing of a TUI using Bubbletea. Much of what follows is informed from various issues and discussions on the Bubbletea github project, where both users and the authors have provided invaluable expertise and guidance.
 
 
 
