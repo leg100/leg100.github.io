@@ -5,6 +5,9 @@ baseURL: "https://leg100.github.io/" # Change this to your real domain name, e.g
 languageCode: en-us
 title: leg100.github.io
 
+params:
+   dateFmt: "02.01.2006"
+
 menu:
   footer:
     - name: Github
