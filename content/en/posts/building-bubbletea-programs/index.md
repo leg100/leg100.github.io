@@ -28,9 +28,9 @@ func (p *Program) eventLoop(model Model, cmds chan Cmd) (Model, error) {
 }
 ```
 
-A message is received from the channel and sent to the `Update()` method on your model. The returned command is sent to a channel, which is invoked in a go routine elsewhere. Your model's `View()` method is then invoked before repeating the loop and processing the next message.
+A message is received from the channel and sent to the `Update()` method on your model. The returned command is sent to a channel, to be invoked in a go routine elsewhere. Your model's `View()` method is then invoked before repeating the loop and processing the next message.
 
-Therefore Bubbletea can only process events as fast as as your `Update()` and `View()` methods. You want these methods to be fast otherwise your program may experience lag, resulting in an unresponsive UI. If your program generates a lot of messages they can back up and the program may appear to stall: a user presses a key and nothing happens for an indetermine amount of time.
+Therefore Bubbletea can only process messages as fast as as your `Update()` and `View()` methods. You want these methods to be fast otherwise your program may experience lag, resulting in an unresponsive UI. If your program generates a lot of messages they can back up and the program may appear to stall: a user presses a key and nothing happens for an indetermine amount of time.
 
 The key to writing a fast model is to offload expensive operations to a `tea.Cmd`:
 
@@ -263,7 +263,7 @@ func (m *model) updateDimensions(width, height int) {
 
 There is a [Github discussion](https://github.com/charmbracelet/bubbletea/discussions/434) on this subject, where there are different opinions on when to use pointer receivers.
 
-## 5. Events are not necessarily received in the order they are sent
+## 5. Messages are not necessarily received in the order they are sent
 
 In Go, if you have more than one go routine sending to a channel, the order in which the sends and receives occur is unspecified:
 
@@ -299,14 +299,14 @@ Running the above can return something like this:
 0512347689
 ```
 
-Now, in Bubbletea, events arrive from a number of sources, including:
+Now, in Bubbletea, messages arrive from a number of sources, including:
 
 1) From user input, key presses, mouse movements, etc.
 2) Messages from tea commands (`tea.Cmd`).
 3) Explicitly sent using `Send(msg)`.
 4) Signals such as window resize, suspend etc.
 
-User input events are sent in a single routine:
+User input messages are sent in a single routine:
 
 ```go
 // readAnsiInputs reads keypress and mouse inputs from a TTY and produces messages
@@ -322,7 +322,7 @@ func readAnsiInputs(ctx context.Context, msgs chan<- Msg, input io.Reader) error
         // ...
 ```
 
-User input events *are* therefore sent in order. Just as well otherwise entering words into, say, a text input would end up as gibberish.
+User input messages *are* therefore sent in order. Just as well otherwise entering words into, say, a text input would end up as gibberish.
 
 However, Bubbletea commands are executed concurrently in separate go routines: 
 
@@ -734,7 +734,7 @@ Which then outputs the animated gif specified in the tape. Here is the full anim
 
 ![pug demo](https://github.com/leg100/pug/raw/master/demo/demo.gif)
 
-Commit the tape alongside your code. You can opt to record a new video as part of your build pipeline. The same tape can produce screenshots which again form part of your (manual) testing as well as documentation.
+Commit your tape alongside your code. You can opt to record a new video as part of your build pipeline. The same tape can produce screenshots which again form part of your (manual) testing as well as documentation.
 
 ## 11. And more...
 
@@ -742,7 +742,7 @@ I'll endeavour to keep adding more "pointers" as I come across them. But there i
 
 * Table widget, with selections, sorting, filtering, and custom row rendering.
 * Split model: split screen with table and preview panes; adjustable/toggleable split.
-* Navigator: makes and caches models, history tracker.
+* Navigator: makes and caches models; history tracker.
 * Integration tests: using teatest for end-to-end testing.
 
 Note: please raise any errors, typos etc., as an issue on the blog's [github project](https://github.com/leg100/leg100.github.io).
