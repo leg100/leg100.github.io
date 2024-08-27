@@ -28,7 +28,7 @@ func (p *Program) eventLoop(model Model, cmds chan Cmd) (Model, error) {
 }
 ```
 
-An event is received from the unbuffered channel and send to the `Update()` method on your model. The returned command is send to an unbuffered channel, which a receiver invokes in a go routine. Your model's `View()` method is then invoked before it repeats the loop and processes the next event.
+An event is received from the commands channel and sent to the `Update()` method on your model. The returned command is sent to an unbuffered channel, which a receiver invokes in a go routine. Your model's `View()` method is then invoked before repeating the loop and processing the next event.
 
 Therefore Bubbletea can only process events as fast as as your `Update()` and `View()` methods. You want these methods to be fast otherwise your program may experience lag, resulting in an unresponsive UI. If your program generates a lot of messages they can back up and the program may appear to stall: a user presses a key and nothing happens for an indetermine amount of time.
 
