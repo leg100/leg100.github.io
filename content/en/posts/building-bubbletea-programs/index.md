@@ -1,5 +1,5 @@
 ---
-title: Tips for Building Bubbletea Programs
+title: Tips for building Bubble Tea programs
 slug: building-bubbletea-programs
 date: 2024-08-24T10:26:59+01:00
 tags:
@@ -10,17 +10,17 @@ tags:
 
 ## 0. Intro
 
-In the words of its authors [Bubbletea](https://github.com/charmbracelet/bubbletea) is a "powerful little [TUI](https://en.wikipedia.org/wiki/Text-based_user_interface) framework" for Go. It may be little but I found it had a steep learning curve before I could get truly comfortable with its power. I spent many a late night wrangling with broken layouts and unresponsive keys before learning the hard way where I had gone wrong. The result of my efforts is [PUG](https://github.com/leg100/pug), a full screen terminal interface for driving terraform:
+In the words of its authors [Bubble Tea](https://github.com/charmbracelet/bubbletea) is a "powerful little [TUI](https://en.wikipedia.org/wiki/Text-based_user_interface) framework" for Go. It may be little but I found it had a steep learning curve before I could get truly comfortable with its power. I spent many a late night wrangling with broken layouts and unresponsive keys before learning the hard way where I had gone wrong. The result of my efforts is [PUG](https://github.com/leg100/pug), a full screen terminal interface for driving terraform:
 
 ![pug tasks screenshot](./tasks.png)
 
-I announced PUG on reddit and in response to a user I [provided some pointers](https://www.reddit.com/r/golang/comments/1duart8/comment/lbhwwoj/) on using Bubbletea.
+I announced PUG on reddit and in response to a user I [provided some pointers](https://www.reddit.com/r/golang/comments/1duart8/comment/lbhwwoj/) on using Bubble Tea.
 
-This blog post is a fuller exposition of that advice; it is not a tutorial but a series of tips (and tricks) to assist anyone in the development, debugging, and testing of their TUI. Much of what follows is informed from various issues and discussions on the Bubbletea github project, where both users and the authors have provided invaluable expertise and guidance.
+This blog post is a fuller exposition of that advice; it is not a tutorial but a series of tips (and tricks) to assist anyone in the development, debugging, and testing of their TUI. Much of what follows is informed from various issues and discussions on the Bubble Tea github project, where both users and the authors have provided invaluable expertise and guidance.
 
 ## 1. Keep the event loop fast {#keepfast}
 
-Bubbletea processes messages in an event loop:
+Bubble Tea processes messages in an event loop:
 
 ```go
 func (p *Program) eventLoop(model Model, cmds chan Cmd) (Model, error) {
@@ -40,7 +40,7 @@ func (p *Program) eventLoop(model Model, cmds chan Cmd) (Model, error) {
 
 A message is received from the channel and sent to the `Update()` method on your model. The returned command is sent to a channel, to be invoked in a go routine elsewhere. Your model's `View()` method is then invoked before repeating the loop and processing the next message.
 
-Therefore Bubbletea can only process messages as fast as as your `Update()` and `View()` methods. You want these methods to be fast otherwise your program may experience lag, resulting in an unresponsive UI. If your program generates a lot of messages they can back up and the program may appear to stall: a user presses a key and nothing happens for an indetermine amount of time.
+Therefore Bubble Tea can only process messages as fast as as your `Update()` and `View()` methods. You want these methods to be fast otherwise your program may experience lag, resulting in an unresponsive UI. If your program generates a lot of messages they can back up and the program may appear to stall: a user presses a key and nothing happens for an indetermine amount of time.
 
 The key to writing a fast model is to offload expensive operations to a `tea.Cmd`:
 
@@ -127,7 +127,7 @@ Run the program then, in another terminal, tail `messages.log`. Go back to the p
 (tea.KeyMsg) ctrl+c
 ```
 
-Note the first message received is the window resize message, which Bubbletea sends to your program shortly after startup.
+Note the first message received is the window resize message, which Bubble Tea sends to your program shortly after startup.
 
 ## 3. Live reload code changes
 
@@ -163,7 +163,7 @@ There are several tools out there like [air](https://github.com/air-verse/air) t
 
 In Go, a method receiver can be passed as either a value or a pointer. When in doubt, one typically uses a pointer receiver, with a value receiver reserved for [particular use cases](https://google.github.io/styleguide/go/decisions#receiver-type).
 
-It can throw Go programmers then that the documented Bubbletea models all have *value* receivers. It may be due to the fact Bubbletea is based on the [Elm Architecture](https://guide.elm-lang.org/architecture/), which is a purely functional pattern, where functions cannot change their internal state, and in Go a method with a value receiver cannot modify its receiver.
+It can throw Go programmers then that the documented Bubble Tea models all have *value* receivers. It may be due to the fact Bubble Tea is based on the [Elm Architecture](https://guide.elm-lang.org/architecture/), which is a purely functional pattern, where functions cannot change their internal state, and in Go a method with a value receiver cannot modify its receiver.
 
 However, you are free to set whatever receiver type you like. If you use a pointer receiver for your model and you make, say, a change to the model in `Init()` then that change is persisted:
 
@@ -205,7 +205,7 @@ Returns:
 initialized
 ```
 
-However, bear in mind that Bubbletea only renders changes in response to messages: 
+However, bear in mind that Bubble Tea only renders changes in response to messages: 
 
 ```go
 type model struct {
@@ -309,7 +309,7 @@ Running the above can return something like this:
 0512347689
 ```
 
-Now, in Bubbletea, messages arrive from a number of sources, including:
+Now, in Bubble Tea, messages arrive from a number of sources, including:
 
 1) From user input, key presses, mouse movements, etc.
 2) Messages from tea commands (`tea.Cmd`).
@@ -334,7 +334,7 @@ func readAnsiInputs(ctx context.Context, msgs chan<- Msg, input io.Reader) error
 
 User input messages *are* therefore sent in order. Just as well otherwise entering words into, say, a text input would end up as gibberish.
 
-However, Bubbletea commands are executed concurrently in separate go routines: 
+However, Bubble Tea commands are executed concurrently in separate go routines: 
 
 ```go
 // handleCommands runs commands in a goroutine and sends the result to the
@@ -439,7 +439,7 @@ And finally, if ordering matters then try to refactor your program so that it do
 
 ## 6. Build a tree of models
 
-Any non-trivial Bubbletea program outgrows a single model. There's a good chance you're using Charm's [bubbles](https://github.com/charmbracelet/bubbles), which are models in their own right, each with a `Init()`, `Update()`, and `View()`. You embed these models within your own model. The same applies to your own code: you may want to push your own components into separate models. The original model then becomes the "top-level" model, whose role becomes merely a message router and screen compositor, responsible for routing messages to the correct "child" models, and populating a layout with content from the child models' `View()` methods.
+Any non-trivial Bubble Tea program outgrows a single model. There's a good chance you're using Charm's [bubbles](https://github.com/charmbracelet/bubbles), which are models in their own right, each with a `Init()`, `Update()`, and `View()`. You embed these models within your own model. The same applies to your own code: you may want to push your own components into separate models. The original model then becomes the "top-level" model, whose role becomes merely a message router and screen compositor, responsible for routing messages to the correct "child" models, and populating a layout with content from the child models' `View()` methods.
 
 And in turn the child models may embed models too, forming a tree of models: the root model receives all messages, which are relayed down the tree to the relevant child model, and the resulting model and command(s) are passed back up the tree, to be returned by the root model's `Update()` method. The same traversal then occurs with the rendering: the root model's `View()` method is called, which in turn calls child models' `View()` methods, and the resulting strings are passed back up the tree to be joined together and returned to the renderer.
 
@@ -457,7 +457,7 @@ The root model receives all messages. There are three main paths for routing dec
 2. Route the message to the current model (if you have one). e.g. all keys other than global keys, such as PageUp and PageDown to scroll up and down some content.
 3. Route the message to all child models, e.g. `tea.WindowSizeMsg`, which contains the current terminal dimensions and all child models may want to use it to calculate heights and widths for rendering content.
 
-None of the above is wrought in iron. It may not make sense for your particular program. However, Bubbletea leaves architectural decisions to you and you'll need to make conscious decisions on how to manage the complexity that inevitably occurs once your program reaches a certain size.
+None of the above is wrought in iron. It may not make sense for your particular program. However, Bubble Tea leaves architectural decisions to you and you'll need to make conscious decisions on how to manage the complexity that inevitably occurs once your program reaches a certain size.
 
 ## 7. Layout arithmetic is error-prone
 
@@ -586,7 +586,7 @@ As your program gets more complex, with more widgets and more models, it's impor
 
 ## 8. Recovering your terminal
 
-Bubbletea recovers gracefully from panics occuring in the event loop but not if it occurs in a command:
+Bubble Tea recovers gracefully from panics occuring in the event loop but not if it occurs in a command:
 
 ```go
 type model struct{}
@@ -760,7 +760,7 @@ Indeed, the screenshots and animated gifs in this article were recorded on VHS, 
 
 ## 11. And more...
 
-I'll endeavour to keep adding more tips as I come across them. But there is no substitute for reading the code of Bubbletea and Bubbletea-based projects. I invite you to read the code of [PUG](https://github.com/leg100/pug), which implements several components that may be of use to your own project:
+I'll endeavour to keep adding more tips as I come across them. But there is no substitute for reading the code of Bubble Tea and Bubble Tea-based projects. I invite you to read the code of [PUG](https://github.com/leg100/pug), which implements several components that may be of use to your own project:
 
 * Table widget, with selections, sorting, filtering, and custom row rendering.
 * Split model: split screen with table and preview panes; adjustable/toggleable split.
