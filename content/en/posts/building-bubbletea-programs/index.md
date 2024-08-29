@@ -447,7 +447,17 @@ This is the model tree implemented in PUG, with arrows illustrating the routing 
 
 ![tree of models in PUG](./model-tree.svg)
 
-Note: the diagram gives the false impression that some models are shared, but in actual fact there is a separate instance of each model, e.g. there is a separate instance of `split` for each of `tasks`, `task groups`, and `state`.
+The root model maintains a list or map of child models. Depending on your program, you may nominate a child model to be the "current" model, which is the one that is currently visible and the one the user interacts with. You might maintain a stack of previously visited models: when the user presses a key your program pushes another model onto the stack, and the top of the stack is then the current model. When the user presses a key to go "back" the model is "popped" off the stack and the previous model becomes the current model.
+
+You can opt to create your child models up front upon program startup. Or you could create them dynamically upon demand, which makes sense if conceptually they don't exist at startup or they may number into the thousands. In the case of PUG, a `LogMessage` model is only created when the user "drills down" into an individual log message. If you choose the dynamic approach it makes sense to maintain a cache of models to avoid unnecessarily re-creating models.
+
+The root model receives all messages. There are three main paths for routing decisions:
+
+1. Handle the message directly in the root model. e.g. "global keys" such those mapping to quit, help, etc,.
+2. Route the message to the current model (if you have one). e.g. all keys other than global keys, such as PageUp and PageDown to scroll up and down some content.
+3. Route the message to all child models, e.g. `tea.WindowSizeMsg`, which contains the current terminal dimensions and all child models may want to use it to calculate heights and widths for rendering content.
+
+None of the above is wrought in iron. It may not make sense for your particular program. However, Bubbletea leaves architectural decisions to you and you'll need to make conscious decisions on how to manage the complexity that inevitably occurs once your program reaches a certain size.
 
 ## 7. Layout arithmetic is error-prone
 
