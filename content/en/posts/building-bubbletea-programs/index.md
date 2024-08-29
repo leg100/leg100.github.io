@@ -1,5 +1,5 @@
 ---
-title: Building Bubbletea Programs
+title: Tips for Building Bubbletea Programs
 slug: building-bubbletea-programs
 date: 2024-08-24T10:26:59+01:00
 tags:
@@ -7,6 +7,16 @@ tags:
   - go
 # draft: true
 ---
+
+## 0. Intro
+
+In the words of its authors [Bubbletea](https://github.com/charmbracelet/bubbletea) is a "powerful little [TUI](https://en.wikipedia.org/wiki/Text-based_user_interface) framework" for Go. It may be little but I found it had a steep learning curve before I could get truly comfortable with its power. I spent many a late night wrangling with broken layouts and unresponsive keys before learning the hard way where I had gone wrong. The result of my efforts is [PUG](https://github.com/leg100/pug), a full screen terminal interface for driving terraform:
+
+![pug tasks screenshot](./tasks.png)
+
+I announced PUG on reddit and in response to a user I [provided some pointers](https://www.reddit.com/r/golang/comments/1duart8/comment/lbhwwoj/) on using Bubbletea.
+
+This blog post is a fuller exposition of that advice; it is not a tutorial but a series of tips (and tricks) to assist anyone in the development, debugging, and testing of their TUI. Much of what follows is informed from various issues and discussions on the Bubbletea github project, where both users and the authors have provided invaluable expertise and guidance.
 
 ## 1. Keep the event loop fast {#keepfast}
 
@@ -147,7 +157,7 @@ I run the scripts in separate terminals. Whenever I save code changes the change
 * If I've messed up and PUG panics upon startup then it'll go into a death spin, restarting umpteen times a second until the error is fixed. A backoff mechanism would help here.
 * Starting and stopping these scripts is a bit of a pain. To stop them, I first need to stop the rebuild script, then use `kill` to terminate the other script.
 
-There are several tools out there like [air](https://github.com/air-verse/air) that do "live reload for the CLI". But [I found they didn't work](https://github.com/charmbracelet/bubbletea/issues/150) with programs that are expecting standard input to be a TTY, which includes TUI's, but users in that same issue [reported success with watchexec](https://github.com/charmbracelet/bubbletea/issues/150#issuecomment-988857894).
+There are several tools out there like [air](https://github.com/air-verse/air) that do "live reload for the CLI". But [I found they didn't work](https://github.com/charmbracelet/bubbletea/issues/150) with programs that are expecting standard input to be a TTY, which includes TUIs, but users in that same issue [reported success with watchexec](https://github.com/charmbracelet/bubbletea/issues/150#issuecomment-988857894).
 
 ## 4. Use receiver methods on your model judiciously
 
@@ -480,7 +490,7 @@ func (m model) View() string {
 
 	content := lipgloss.NewStyle().
 		Width(m.width).
-        // accomodate header and footer
+        // accommodate header and footer
 		Height(m.height-1-1).
 		Align(lipgloss.Center, lipgloss.Center).
 		Render("content")
@@ -519,7 +529,7 @@ func (m model) View() string {
 
 	content := lipgloss.NewStyle().
 		Width(m.width).
-        // accomodate header and footer
+        // accommodate header and footer
 		Height(m.height-1-1).
 		Align(lipgloss.Center, lipgloss.Center).
 		Render("content")
@@ -532,7 +542,7 @@ But this breaks the layout, forcing the header off the terminal:
 
 ![broken layout](./layout-arithmetic-broken/screenshot.png)
 
-The problem is that the arithmetic has not been updated to accomodate the border. The code is brittle, using hard coded heights which can easily be forgotten about when updating code. The fix is to use lipgloss's `Height()` and `Width()` methods to reference heights and widths of widgets:
+The problem is that the arithmetic has not been updated to accommodate the border. The code is brittle, using hard coded heights which can easily be forgotten about when updating code. The fix is to use lipgloss's `Height()` and `Width()` methods to reference heights and widths of widgets:
 
 ```go
 func (m model) View() string {
@@ -736,13 +746,15 @@ Which then outputs the animated gif specified in the tape. Here is the full anim
 
 Commit your tape alongside your code. You can opt to record a new video as part of your build pipeline. The same tape can produce screenshots which again form part of your (manual) testing as well as documentation.
 
+Indeed, the screenshots and animated gifs in this article were recorded on VHS, and can be found alongside the tapes in the [blog's repo](https://github.com/leg100/leg100.github.io).
+
 ## 11. And more...
 
-I'll endeavour to keep adding more "pointers" as I come across them. But there is no substitute for reading the code of Bubbletea and Bubbletea-based projects. I invite you to read the code of [PUG](https://github.com/leg100/pug), which implements several components that may be of use to your own project:
+I'll endeavour to keep adding more tips as I come across them. But there is no substitute for reading the code of Bubbletea and Bubbletea-based projects. I invite you to read the code of [PUG](https://github.com/leg100/pug), which implements several components that may be of use to your own project:
 
 * Table widget, with selections, sorting, filtering, and custom row rendering.
 * Split model: split screen with table and preview panes; adjustable/toggleable split.
 * Navigator: makes and caches models; history tracker.
 * Integration tests: using teatest for end-to-end testing.
 
-Note: please raise any errors, typos etc., as an issue on the blog's [github project](https://github.com/leg100/leg100.github.io).
+Note: please raise any errors, typos etc., as an issue on the blog's [repo](https://github.com/leg100/leg100.github.io).

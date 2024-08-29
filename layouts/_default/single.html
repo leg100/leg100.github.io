@@ -4,9 +4,6 @@
 			<h1>{{ .Title }}</h1>
 			<b><time>{{ .Date.Format (default "2006-01-02 15:04:05" .Site.Params.dateFmt) }}</time></b>
 			<div>
-                {{ with .Resources.Get "intro.md" }}
-                  {{ .Content }}
-                {{ end }}
                 {{ .TableOfContents }}
 				{{ .Content }}
 			</div>
