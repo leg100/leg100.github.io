@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -14,7 +13,6 @@ type model struct {
 
 func (m *model) Init() tea.Cmd {
 	go func() {
-		<-time.After(time.Second)
 		m.content = "initialized\n"
 	}()
 	return nil

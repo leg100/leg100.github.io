@@ -48,13 +48,13 @@ The key to writing a fast model is to offload expensive operations to a `tea.Cmd
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg.(type) {
 	case tea.KeyMsg:
-            // don't do this:
-            // time.Sleep(time.Minute)
+        // don't do this:
+        // time.Sleep(time.Minute)
 
-            // do this:
-            return func() tea.Msg {
-                time.Sleep(time.Minute)
-            }
+        // do this:
+        return m, func() tea.Msg {
+            time.Sleep(time.Minute)
+        }
 	}
 	return m, nil
 }
@@ -205,7 +205,7 @@ Returns:
 initialized
 ```
 
-However, bear in mind that Bubble Tea only renders changes in response to messages: 
+However, don't make the mistake of introducing a race condition by making changes outside of the event loop:
 
 ```go
 type model struct {
@@ -214,7 +214,6 @@ type model struct {
 
 func (m *model) Init() tea.Cmd {
 	go func() {
-		<-time.After(time.Second)
 		m.content = "initialized\n"
 	}()
 	return nil
@@ -242,19 +241,11 @@ func main() {
 }
 ```
 
-Returns:
+If you repeatedly run this program you'll find it returns `initialized` some of the time and sometimes `uninitialized`. In the latter case, the event loop has already called `View()` before the go routine sets the content to `initialized` (see the [event loop code above]({{< ref "#keepfast" >}})). 
 
-```
-uninitialized
-```
+Unless there is a good reason to do otherwise, stick to the normal message flow: any changes to the model should be made in `Update()` and returned immediately in the first return value. Straying from this course not only defies the natural order of Bubbletea, it also risks making it slower (see [Keep the event loop fast]({{< ref "#keepfast" >}})).
 
-...but only once a key is pressed several seconds later does it return:
-
-```
-initialized
-```
-
-For this reason, making changes to the model is best done in the normal message flow, either in `Update()` or via a `tea.Cmd`. However, using a pointer receiver is useful on helper methods:
+Using pointer receivers is not necessarily at odds with this advice. For instance, a pointer receiver is useful for helper methods:
 
 ```go
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
