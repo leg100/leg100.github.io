@@ -609,7 +609,7 @@ Which when invoked causes this:
 
 Note the stack trace is malformed and there is no cursor. Because the panic was not recovered, the terminal was not reset to its previous settings, with raw mode disabled etc, and any characters you type are no longer echoed.
 
-The recover your terminal, reset it:
+To recover your terminal, reset it:
 
 ```bash
 reset
