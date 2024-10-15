@@ -5,7 +5,6 @@ date: 2024-10-15T12:35:02+01:00
 tags:
   - go
   - postgres
-draft: true
 ---
 
 ## 0. Synopsis
