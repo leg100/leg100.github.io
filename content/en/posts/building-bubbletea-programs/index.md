@@ -5,7 +5,6 @@ date: 2024-08-24T10:26:59+01:00
 tags:
   - bubbletea
   - go
-# draft: true
 ---
 
 ## 0. Intro
